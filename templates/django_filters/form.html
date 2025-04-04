@@ -1,0 +1,9 @@
+<form class="form" action="" method="get">
+    {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>

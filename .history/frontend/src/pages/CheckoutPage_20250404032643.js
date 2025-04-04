@@ -1,0 +1,207 @@
+// frontend/src/pages/CheckoutPage.js
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearCart } from '../features/cart/cartSlice';
+import api from '../services/api';
+import styled from 'styled-components';
+import CouponComponent from '../components/checkout/CouponForm';
+
+
+const CheckoutPage = () => {
+  const cart = useSelector(state => state.cart.items);
+  const cartTotal = useSelector(state => state.cart.total);
+  const user = useSelector(state => state.auth.user);
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Estado para dados de envio
+  const [shippingData, setShippingData] = useState({
+    fullName: user?.name || '',
+    address: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'Brasil'
+  });
+  
+  // Estado para cupom de desconto
+  const [couponCode, setCouponCode] = useState(null);
+  const [discount, setDiscount] = useState(0);
+  const [totalWithDiscount, setTotalWithDiscount] = useState(cartTotal);
+  
+  // Atualizar o total com desconto quando o carrinho ou desconto mudar
+  useEffect(() => {
+    setTotalWithDiscount(Math.max(0, cartTotal - discount));
+  }, [cartTotal, discount]);
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setShippingData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  // Funções para gerenciar cupons
+  const handleApplyCoupon = (code, discountAmount) => {
+    setCouponCode(code);
+    setDiscount(discountAmount);
+  };
+  
+  const handleRemoveCoupon = () => {
+    setCouponCode(null);
+    setDiscount(0);
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    
+    try {
+      if (!isAuthenticated) {
+        navigate('/login', { state: { from: '/checkout' } });
+        return;
+      }
+      
+      // Verificar se temos produtos no carrinho
+      if (cart.length === 0) {
+        setError('Seu carrinho está vazio.');
+        setLoading(false);
+        return;
+      }
+      
+      // Criar pedido
+      const orderData = {
+        items: cart.map(item => ({
+          product: item.id,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        shipping_full_name: shippingData.fullName,
+        shipping_address: shippingData.address,
+        shipping_city: shippingData.city,
+        shipping_state: shippingData.state,
+        shipping_postal_code: shippingData.postalCode,
+        shipping_country: shippingData.country,
+        total_amount: cartTotal,
+        // Não precisamos enviar o desconto, pois será aplicado ao criar a preferência
+      };
+      
+      // Criando o pedido no backend
+      console.log('Enviando dados do pedido:', orderData);
+      const orderResponse = await api.post('/api/orders/', orderData);
+      const createdOrder = orderResponse.data;
+      console.log('Pedido criado:', createdOrder);
+      
+      // Criar preferência de pagamento com o Mercado Pago
+      // Agora incluindo o código do cupom, se houver
+      const paymentData = {
+        order_id: createdOrder.id
+      };
+      
+      if (couponCode) {
+        paymentData.coupon_code = couponCode;
+      }
+      
+      const response = await api.post('/api/payments/create/', paymentData);
+      
+      console.log('Preferência de pagamento criada:', response.data);
+      
+      // Redirecionar para o Mercado Pago
+      window.location.href = response.data.init_point;
+      
+      // Limpar o carrinho
+      dispatch(clearCart());
+      
+    } catch (err) {
+      console.error('Erro ao processar checkout:', err);
+      setError('Ocorreu um erro ao processar seu pedido. Por favor, tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Checkout</h1>
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+          <p>{error}</p>
+        </div>
+      )}
+      
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Formulário de Envio */}
+        <div className="w-full md:w-1/2">
+          <h2 className="text-xl font-semibold mb-4">Informações de Envio</h2>
+          <form onSubmit={handleSubmit}>
+            {/* ... (campos de formulário existentes) ... */}
+            
+            <button
+              type="submit"
+              className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors w-full mt-4"
+              disabled={loading}
+            >
+              {loading ? 'Processando...' : 'Finalizar Compra'}
+            </button>
+          </form>
+        </div>
+        
+        {/* Resumo do Pedido */}
+        <div className="w-full md:w-1/2 bg-gray-50 p-6 rounded-lg">
+          <h2 className="text-xl font-semibold mb-4">Resumo do Pedido</h2>
+          
+          {cart.length === 0 ? (
+            <p>Seu carrinho está vazio.</p>
+          ) : (
+            <>
+              <div className="divide-y">
+                {cart.map(item => (
+                  <div key={item.id} className="py-3 flex justify-between">
+                    <div>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-sm text-gray-600">Quantidade: {item.quantity}</p>
+                    </div>
+                    <p className="font-medium">R$ {(item.price * item.quantity).toFixed(2)}</p>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Componente de Cupom */}
+              <CouponComponent 
+                cartTotal={cartTotal}
+                onApplyCoupon={handleApplyCoupon}
+                onRemoveCoupon={handleRemoveCoupon}
+              />
+              
+              <div className="mt-6 pt-4 border-t">
+                <div className="flex justify-between text-lg">
+                  <span>Subtotal:</span>
+                  <span>R$ {cartTotal.toFixed(2)}</span>
+                </div>
+                
+                {discount > 0 && (
+                  <div className="flex justify-between text-lg text-green-600">
+                    <span>Desconto:</span>
+                    <span>-R$ {discount.toFixed(2)}</span>
+                  </div>
+                )}
+                
+                <div className="flex justify-between font-bold text-lg mt-2">
+                  <span>Total:</span>
+                  <span>R$ {totalWithDiscount.toFixed(2)}</span>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CheckoutPage;

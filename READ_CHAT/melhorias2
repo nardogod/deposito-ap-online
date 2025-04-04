@@ -1,0 +1,141 @@
+# Novas Funcionalidades Implementadas
+
+## Sistema de Busca Avançada e Filtros
+
+O sistema de busca avançada e filtros foi implementado para melhorar a experiência do usuário ao navegar pelo catálogo de produtos. As principais funcionalidades incluem:
+
+### Backend
+
+- **Filtros Avançados**: Implementação de filterset customizado com suporte para:
+  - Filtro por faixa de preço (mínimo e máximo)
+  - Busca por nome, descrição e categoria
+  - Filtro por disponibilidade (em estoque, fora de estoque, sob encomenda)
+  - Filtro de produtos para emergências
+  - Filtro por categoria
+
+- **Ordenação**: Suporte para ordenação dos resultados por:
+  - Preço (crescente ou decrescente)
+  - Nome (A-Z ou Z-A)
+  - Data de criação (mais recentes primeiro)
+  - Avaliação média (melhor avaliados primeiro)
+
+- **Paginação**: Implementação de paginação para melhorar a performance e navegação.
+
+- **Otimização de Consultas**: Uso de `select_related` e `prefetch_related` para reduzir o número de consultas ao banco de dados.
+
+### Frontend
+
+- **Componente de Busca**: Interface intuitiva com:
+  - Campo de busca por texto para pesquisa livre
+  - Filtros expansíveis/colapsáveis
+  - Seleção de categorias
+  - Filtro de faixa de preço
+  - Opções de ordenação
+  - Filtros por disponibilidade e características especiais
+
+- **Persistência na URL**: Os parâmetros de busca são armazenados na URL, permitindo:
+  - Compartilhamento de buscas específicas
+  - Navegação entre páginas mantendo os filtros
+  - Histórico de navegação consistente
+
+- **Experiência Responsiva**: Interface adaptável para diferentes tamanhos de tela.
+
+- **Paginação no Cliente**: Interface de paginação com:
+  - Navegação por números de página
+  - Botões de anterior/próximo
+  - Indicador de página atual
+  - Elipses para muitas páginas
+
+## Sistema de Cupons de Desconto
+
+O sistema de cupons de desconto foi implementado para permitir promoções e estratégias de marketing. As principais funcionalidades incluem:
+
+### Backend
+
+- **Modelo de Cupons**: Implementação completa com:
+  - Código único do cupom
+  - Tipos de desconto (percentual ou valor fixo)
+  - Valor do desconto
+  - Valor mínimo de compra
+  - Valor máximo de desconto (para cupons percentuais)
+  - Período de validade (data de início e fim)
+  - Limite de usos
+  - Contador de usos
+  - Restrições por categoria ou produtos específicos
+  - Status ativo/inativo
+
+- **API de Cupons**: Endpoints para:
+  - Aplicar cupom ao carrinho
+  - Validar cupom sem aplicar
+  - Remover cupom aplicado
+
+- **Integração com Pagamentos**: Suporte para:
+  - Aplicação de desconto ao criar preferência de pagamento
+  - Registro do cupom e valor descontado no pedido
+  - Exibição do desconto como item separado no gateway de pagamento
+
+### Frontend
+
+- **Componente de Aplicação de Cupom**: Interface com:
+  - Campo para inserir código do cupom
+  - Validação e feedback imediato
+  - Exibição do desconto aplicado
+  - Opção para remover o cupom
+
+- **Integração no Checkout**: Inclusão na página de checkout com:
+  - Exibição do resumo do pedido com subtotal
+  - Linha separada para o desconto aplicado
+  - Atualização automática do valor total
+  - Envio do código do cupom ao criar o pagamento
+
+- **Feedback ao Usuário**: Mensagens claras sobre:
+  - Sucesso ao aplicar o cupom
+  - Erros de validação (cupom inválido, expirado, etc.)
+  - Requisitos não atendidos (valor mínimo de compra, etc.)
+
+## Administração
+
+- **Interface Admin para Cupons**: Dashboard no admin do Django com:
+  - Listagem de todos os cupons com filtros
+  - Exibição do status de validade em tempo real
+  - Estatísticas de uso
+  - Criação e edição fácil de cupons
+  - Restrição por produtos e categorias
+
+- **Gestão de Buscas**: Para administradores, capacidade de:
+  - Ver estatísticas de buscas populares (preparado para implementação futura)
+  - Configurar produtos em destaque
+  - Ajustar relevância de resultados
+
+## Como Utilizar
+
+### Busca Avançada
+
+1. Acesse a página de produtos
+2. Digite termos de busca no campo de texto e/ou expanda a seção de filtros
+3. Selecione as opções desejadas (categoria, faixa de preço, etc.)
+4. Clique em "Aplicar Filtros" para atualizar os resultados
+5. Use a opção "Ordenar por" para ajustar a ordem dos resultados
+6. Navegue pelas páginas dos resultados usando a paginação
+
+### Cupons de Desconto
+
+1. Durante o checkout, localize a seção "Cupom de Desconto"
+2. Insira o código do cupom e clique em "Aplicar Cupom"
+3. Se válido, o desconto será aplicado automaticamente ao total
+4. Continue com o pagamento normalmente
+5. O desconto aparecerá no resumo do pedido e no gateway de pagamento
+
+## Considerações Técnicas
+
+- **Segurança**: Validações rigorosas no servidor para evitar abusos em cupons.
+- **Performance**: Otimização de consultas para busca eficiente mesmo com muitos produtos.
+- **Escalabilidade**: Arquitetura preparada para crescimento do catálogo e número de usuários.
+- **Manutenção**: Código modular e bem documentado para facilitar atualizações.
+
+## Próximos Passos
+
+- Implementar suporte para cupons específicos por usuário
+- Adicionar sistema de recomendação baseado nas buscas e compras
+- Implementar busca com Elasticsearch para melhor performance com grandes catálogos
+- Adicionar estatísticas detalhadas de uso de cupons e comportamento de busca

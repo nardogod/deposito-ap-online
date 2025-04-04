@@ -1,0 +1,123 @@
+/* static/css/order_admin.css */
+
+/* Formatação dos status na lista de pedidos */
+.status-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-created {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+.status-paid {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-processing {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.status-shipped {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-delivered {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Formatação dos botões de ação */
+.button-container {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.button-container .button {
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Personalização do layout da página de detalhes do pedido */
+.order-summary {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.order-summary h2 {
+    margin-top: 0;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+}
+
+.field-row {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.field-label {
+    font-weight: bold;
+    width: 150px;
+}
+
+.field-value {
+    flex: 1;
+}
+
+/* Destacar campos importantes */
+.field-total {
+    font-size: 16px;
+    color: #007bff;
+}
+
+.field-status {
+    font-weight: bold;
+}
+
+/* Melhorar a aparência das seções de fieldsets */
+fieldset.module h2 {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+}
+
+/* Estilos de impressão para a página de detalhes do pedido */
+@media print {
+    header, #header, .submit-row, .breadcrumbs, #changelist-filter {
+        display: none !important;
+    }
+    
+    #content {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .order-summary {
+        page-break-inside: avoid;
+    }
+    
+    fieldset.module {
+        border: 1px solid #ccc !important;
+        margin-bottom: 20px !important;
+    }
+}
