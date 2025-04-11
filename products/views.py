@@ -7,30 +7,48 @@ from django.db.models import Q, Avg
 from .models import Category, Product, ProductImage, ProductReview
 from .serializers import CategorySerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True, reviews_enabled=False)  # Adicione reviews_enabled=False
-        # Resto do código permanece o mesmo
-
 class ProductFilter(FilterSet):
     """FilterSet personalizado para filtrar produtos com opções avançadas"""
     min_price = df_filters.NumberFilter(field_name="price", lookup_expr='gte')
     max_price = df_filters.NumberFilter(field_name="price", lookup_expr='lte')
     name = df_filters.CharFilter(field_name="name", lookup_expr='icontains')
     category_name = df_filters.CharFilter(field_name="category__name", lookup_expr='icontains')
+    # Adicionar filtro por slug da categoria
+    category_slug = df_filters.CharFilter(field_name="category__slug")
+    # Modificar o campo category para aceitar ID ou nome
+    category = df_filters.CharFilter(method='filter_category')
     in_stock = df_filters.BooleanFilter(method='filter_in_stock')
     is_emergency = df_filters.BooleanFilter(field_name="is_emergency")
     
     class Meta:
         model = Product
         fields = ['category', 'min_price', 'max_price', 'name', 'category_name', 
-                  'availability', 'in_stock', 'is_emergency']
+                  'category_slug', 'availability', 'in_stock', 'is_emergency']
     
     def filter_in_stock(self, queryset, name, value):
         """Filtrar produtos em estoque"""
         if value:
             return queryset.filter(stock__gt=0)
         return queryset
+        
+    def filter_category(self, queryset, name, value):
+        """
+        Filtrar por categoria de forma flexível (ID, nome ou slug)
+        """
+        # Tentar como ID
+        try:
+            category_id = int(value)
+            return queryset.filter(category_id=category_id)
+        except (ValueError, TypeError):
+            pass
+            
+        # Tentar como slug
+        category_by_slug = queryset.filter(category__slug__iexact=value)
+        if category_by_slug.exists():
+            return category_by_slug
+            
+        # Tentar como nome
+        return queryset.filter(category__name__icontains=value)
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet para listar e recuperar categorias"""
@@ -42,7 +60,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet para listar e recuperar produtos com filtros avançados"""
-    queryset = Product.objects.all()  # Adicionado queryset explícito
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'slug'
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -145,15 +163,13 @@ class ProductReviewViewSet(viewsets.ModelViewSet):
         product_id = request.query_params.get('product_id')
         product_slug = request.query_params.get('product_slug')
     
-        print(f"Buscando avaliações para o produto ID: {product_id}, Slug: {product_slug}")
-    
         if not (product_id or product_slug):
              return Response(
             {"detail": "Forneça product_id ou product_slug"},
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Para usuários normais, filtrar apenas avaliações aprovadas
+        # Para usuários normais, filtrar apenas avaliações aprovadas
         if product_id:
              reviews = ProductReview.objects.filter(product_id=product_id)
         else:
@@ -162,7 +178,5 @@ class ProductReviewViewSet(viewsets.ModelViewSet):
         if not request.user.is_staff:
              reviews = reviews.filter(is_approved=True)
     
-             print(f"Encontradas {reviews.count()} avaliações")
-             serializer = self.get_serializer(reviews, many=True)
-             print(f"Dados serializados: {serializer.data}")
+        serializer = self.get_serializer(reviews, many=True)
         return Response(serializer.data)

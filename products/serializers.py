@@ -2,6 +2,24 @@ from rest_framework import serializers
 from django.db.models import Avg
 from .models import Category, Product, ProductImage, ProductReview
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    """Serializer para imagens de produto"""
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image', 'alt_text', 'is_main']
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Serializer para categorias de produtos"""
+    products_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug', 'description', 'image', 'is_active', 'products_count']
+        
+    def get_products_count(self, obj):
+        """Retorna o número de produtos ativos na categoria"""
+        return obj.products.filter(is_active=True).count()
+
 class ProductReviewSerializer(serializers.ModelSerializer):
     """Serializer para avaliações de produtos"""
     username = serializers.SerializerMethodField()
@@ -29,27 +47,24 @@ class ProductReviewSerializer(serializers.ModelSerializer):
         validated_data['user'] = user
         return super().create(validated_data)
 
-class ProductImageSerializer(serializers.ModelSerializer):
-    """Serializer para imagens de produto"""
-    class Meta:
-        model = ProductImage
-        fields = ['id', 'image', 'alt_text', 'is_main']
-
 class ProductSerializer(serializers.ModelSerializer):
     """Serializer completo para produtos"""
     images = ProductImageSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
-    #reviews = ProductReviewSerializer(many=True, read_only=True)
+    category_slug = serializers.CharField(source='category.slug', read_only=True)
+    # Modificar a representação da categoria para ser apenas o ID
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
     average_rating = serializers.SerializerMethodField()
-    #reviews_count = serializers.SerializerMethodField()
+    reviews_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'slug', 'sku', 'category', 'category_name', 'description', 
-                  'price', 'discount_price', 'stock', 'availability', 'is_emergency', 
-                  'weight', 'dimensions', 'is_active', 'images',  'average_rating',
-                  'reviews_count',#'reviews'
-                  ]
+        fields = [
+            'id', 'name', 'slug', 'sku', 'category', 'category_name', 'category_slug',
+            'description', 'price', 'discount_price', 'stock', 'availability', 
+            'is_emergency', 'weight', 'dimensions', 'is_active', 'images',
+            'average_rating', 'reviews_count'
+        ]
     
     def get_average_rating(self, obj):
         """Calcula a média das avaliações do produto"""
@@ -65,15 +80,3 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_reviews_count(self, obj):
         """Retorna o número de avaliações aprovadas do produto"""
         return obj.reviews.filter(is_approved=True).count()
-        
-class CategorySerializer(serializers.ModelSerializer):
-    """Serializer para categorias de produtos"""
-    products_count = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Category
-        fields = ['id', 'name', 'slug', 'description', 'image', 'is_active', 'products_count']
-        
-    def get_products_count(self, obj):
-        """Retorna o número de produtos ativos na categoria"""
-        return obj.products.filter(is_active=True).count()

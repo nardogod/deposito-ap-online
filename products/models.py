@@ -6,33 +6,6 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class Product(models.Model):
-    # Adicione um campo para desativar reviews
-    reviews_enabled = models.BooleanField(default=False)
-    
-class ProductReview(models.Model):
-    """Modelo para avaliações de produtos por usuários"""
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
-    rating = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        help_text=_("Avaliação de 1 a 5 estrelas")
-    )
-    title = models.CharField(_("Título"), max_length=100)
-    comment = models.TextField(_("Comentário"))
-    created_at = models.DateTimeField(_("Criado em"), auto_now_add=True)
-    is_approved = models.BooleanField(_("Aprovado"), default=True)
-    
-    class Meta:
-        verbose_name = _("Avaliação de Produto")
-        verbose_name_plural = _("Avaliações de Produtos")
-        ordering = ['-created_at']
-        # Garantir que um usuário só possa avaliar um produto uma vez
-        unique_together = ('product', 'user')
-    
-    def __str__(self):
-        return f"Avaliação de {self.user.username} para {self.product.name}"
-
 class Category(models.Model):
     name = models.CharField(_("Nome"), max_length=100)
     slug = models.SlugField(_("Slug"), max_length=120, unique=True)
@@ -73,6 +46,7 @@ class Product(models.Model):
     weight = models.DecimalField(_("Peso (kg)"), max_digits=6, decimal_places=2, blank=True, null=True)
     dimensions = models.CharField(_("Dimensões"), max_length=100, blank=True)
     is_active = models.BooleanField(_("Ativo"), default=True)
+    reviews_enabled = models.BooleanField(_("Avaliações habilitadas"), default=True)
     created_at = models.DateTimeField(_("Criado em"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Atualizado em"), auto_now=True)
     
@@ -101,3 +75,26 @@ class ProductImage(models.Model):
     
     def __str__(self):
         return f"Imagem de {self.product.name}"
+
+class ProductReview(models.Model):
+    """Modelo para avaliações de produtos por usuários"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text=_("Avaliação de 1 a 5 estrelas")
+    )
+    title = models.CharField(_("Título"), max_length=100)
+    comment = models.TextField(_("Comentário"))
+    created_at = models.DateTimeField(_("Criado em"), auto_now_add=True)
+    is_approved = models.BooleanField(_("Aprovado"), default=True)
+    
+    class Meta:
+        verbose_name = _("Avaliação de Produto")
+        verbose_name_plural = _("Avaliações de Produtos")
+        ordering = ['-created_at']
+        # Garantir que um usuário só possa avaliar um produto uma vez
+        unique_together = ('product', 'user')
+    
+    def __str__(self):
+        return f"Avaliação de {self.user.username} para {self.product.name}"
