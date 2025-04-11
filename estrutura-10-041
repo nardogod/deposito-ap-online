@@ -1,0 +1,180 @@
+├── backend
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── static
+│   │   ├── css
+│   │   │   └── order_admin.css
+│   │   └── js
+│   │       └── order_admin.js
+│   ├── urls.py
+│   └── wsgi.py
+├── backup_codigo.py
+├── db.sqlite3
+├── estrutura-projeto
+│   ├── estrutura no dia 03-04
+│   └── estrutura5
+├── estrutura10-04
+├── frontend
+│   ├── README.md
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   └── src
+│       ├── App.css
+│       ├── App.js
+│       ├── App.test.js
+│       ├── assets
+│       ├── components
+│       │   ├── CouponForm.css
+│       │   ├── CouponForm.js
+│       │   ├── checkout
+│       │   │   ├── CouponForm.css
+│       │   │   └── CouponForm.js
+│       │   ├── common
+│       │   │   ├── Button.css
+│       │   │   ├── Button.js
+│       │   │   └── ProtectedRoute.js
+│       │   ├── layout
+│       │   │   ├── Footer.css
+│       │   │   ├── Footer.js
+│       │   │   ├── Header.css
+│       │   │   └── Header.js
+│       │   ├── orders
+│       │   │   ├── OrderDetail.css
+│       │   │   └── OrderDetail.js
+│       │   ├── products
+│       │   │   ├── ProductReviews.css
+│       │   │   ├── ProductReviews.js
+│       │   │   └── ProductSearch.js
+│       │   └── ui
+│       │       ├── Button.css
+│       │       ├── Button.js
+│       │       ├── LoadingSpinner.css
+│       │       └── LoadingSpinner.js
+│       ├── features
+│       │   ├── auth
+│       │   │   └── authSlice.js
+│       │   ├── cart
+│       │   │   └── cartSlice.js
+│       │   └── products
+│       │       └── productsSlice.js
+│       ├── hooks
+│       ├── index.css
+│       ├── index.js
+│       ├── logo.svg
+│       ├── pages
+│       │   ├── CartPage.css
+│       │   ├── CartPage.js
+│       │   ├── CheckoutPage.css
+│       │   ├── CheckoutPage.js
+│       │   ├── EmergencyPage.js
+│       │   ├── HomePage.css
+│       │   ├── HomePage.js
+│       │   ├── LoginPage.js
+│       │   ├── NotFoundPage.js
+│       │   ├── OrderConfirmationPage.js
+│       │   ├── PaymentFailurePage.js
+│       │   ├── PaymentPage.css
+│       │   ├── PaymentPendingPage.js
+│       │   ├── PaymentSuccessPage.js
+│       │   ├── ProductDetailPage.css
+│       │   ├── ProductDetailPage.js
+│       │   ├── ProductsPage.css
+│       │   ├── ProductsPage.js
+│       │   ├── ProfilePage.js
+│       │   └── RegisterPage.js
+│       ├── reportWebVitals.js
+│       ├── services
+│       │   └── api.js
+│       ├── setupTests.js
+│       ├── store
+│       │   ├── cartSlice.js
+│       │   ├── index.js
+│       │   ├── orderSlice.js
+│       │   └── paymentSlice.js
+│       └── utils
+├── hello-ngrok
+│   └── example.py
+├── manage.py
+├── media
+│   └── products
+│       ├── BRACO_PCHUV.N.HORIZONTE_ALUM._30CM.jpg
+│       ├── LAMP_LED_A.FATOR_FOXLUX_20W_6500K.jpg
+│       └── LAMP_LED_A_3H4vNLx.FATOR_FOXLUX_20W_6500K.jpg
+├── orders
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_initial.py
+│   │   ├── 0003_order_cancellation_reason_order_estimated_delivery_and_more.py
+│   │   ├── 0004_alter_cart_options_alter_cartitem_options_and_more.py
+│   │   ├── 0005_order_coupon_code_order_discount_amount.py
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── notifications.py
+│   ├── serializers.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── payments
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_alter_payment_options_and_more.py
+│   │   ├── 0003_coupon.py
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── services.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── products
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_productreview.py
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── requirements.txt
+├── run_ngrok.py
+├── templates
+│   ├── django_filters
+│   │   ├── form.html
+│   │   └── rest_framework
+│   └── emails
+│       ├── order_status_update.html
+│       ├── order_status_update_plain.html
+│       ├── payment_confirmation.html
+│       └── payment_confirmation_plain.html
+├── teste_backup.py
+├── tree_gerator.py
+└── users
+    ├── __init__.py
+    ├── admin.py
+    ├── apps.py
+    ├── migrations
+    │   ├── 0001_initial.py
+    │   └── __init__.py
+    ├── models.py
+    ├── serializers.py
+    ├── tests.py
+    ├── urls.py
+    └── views.py

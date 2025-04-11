@@ -6,6 +6,10 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+class Product(models.Model):
+    # Adicione um campo para desativar reviews
+    reviews_enabled = models.BooleanField(default=False)
+    
 class ProductReview(models.Model):
     """Modelo para avaliações de produtos por usuários"""
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='reviews')
